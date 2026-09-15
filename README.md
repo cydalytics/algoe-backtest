@@ -28,6 +28,8 @@ cd /d D:\AlgoE\algoe-backtest
 3-run.bat
 ```
 
+`0-selftest` uses synthetic data in a temp folder. It does **not** read `out\facts`. SciPy “values outside bounds” lines are warnings; you want `[selftest] PASS`.
+
 Then open `out\report.html`.
 
 **Web** (does not wait for `3-run` if the cache is already filled):
@@ -41,4 +43,4 @@ Open http://localhost:3000/backtest → Real data → same `Raw_Data` folder →
 
 `-Source sim` is only the live board. Backtest uses the parquet path you type.
 
-If you already ran an older `3-run`, copy `algoe-backtest-old\out\facts` into the new `algoe-backtest\out\facts` before running `3-run` again so those days are absorbed and not rebuilt.
+If you already ran an older `3-run`, copy `algoe-backtest-old\out\facts` into the new `algoe-backtest\out\facts` **after** `0-selftest` and **before** `3-run`, so those days are absorbed and not rebuilt. Do not copy facts just to run selftest.
