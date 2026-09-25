@@ -1,0 +1,26 @@
+{
+  "name": "algoe-turnover-film",
+  "private": true,
+  "version": "1.0.0",
+  "description": "75-second technical film: how the Algo E turnover forecast works.",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts TurnoverFilm out/turnover-film.mp4",
+    "still": "remotion still src/index.ts TurnoverFilm",
+    "pulse": "python scripts/make_pulse.py"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.529",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "remotion": "^4.0.529"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "^7.0.2"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true
+  }
+}

@@ -1,0 +1,30 @@
+# Runtime and data — never upload these. The parquet lives on the offline box.
+algoe.db
+backend/algoe.db
+backtest_facts/
+parquet_cache/
+captures/
+**/__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Build output — rebuild with package-backtest.ps1 / package.ps1
+dist/
+frontend/node_modules/
+frontend/.next/
+backend/.selftest_data/
+
+# Stale copy left behind when the engine moved into backend/src/backtest/parquet
+parquet_backtest/
+
+# Film render output and its installed packages
+video/node_modules/
+video/out/
+tmp/
+
+# Local editor / OS
+.DS_Store
+Thumbs.db
+.env
+.env.*
