@@ -2,9 +2,13 @@
 
 No parquet in this repo. Data stays on the office machine.
 
+Download both zips on a machine that has GitHub. Copy the two files onto USB (or a shared drive) and only then move them into the box that has no internet. That box never clones this repo.
+
+On the backtest page, **Open cached** reads the panel cache beside `Raw_Data` and shows turnover and belief cut by phase, bet type, line, clock, TG×SUP, and quote age. **Solve** is separate and updates the Optimize tab after each day. It does not change WAPE or ECE.
+
 | file | what it is |
 |---|---|
-| `algoe-backtest.zip` | script: `0-selftest` … `3-run.bat` → `out\report.html` |
+| `algoe-backtest.zip` | script: `0-selftest` … `3-run.bat` (accuracy) then `4-optimize.bat` (TG/SUP) → `out\report.html` |
 | `algoe-mvp.zip` | web platform: `start.bat` → http://localhost:3000/backtest |
 
 Both read and write the same cache next to the parquet root:
@@ -26,9 +30,12 @@ cd /d D:\AlgoE\algoe-backtest
 0-selftest.bat
 1-probe.bat
 3-run.bat
+4-optimize.bat
 ```
 
 `0-selftest` uses synthetic data in a temp folder. It does **not** read `out\facts`. SciPy “values outside bounds” lines are warnings; you want `[selftest] PASS`.
+
+`3-run` scores turnover and belief on every row and writes `out\report.html` without the solver. `4-optimize` is the slow sampled TG/SUP step; skip it until you want that number.
 
 Then open `out\report.html`.
 
