@@ -50,6 +50,8 @@ Drag the `Raw_Data` folder onto `algoe-1-check-data.bat` if it is not at `S:\Use
 
 Take `--end` from the `window end` line of the data check. `--workers N` builds N months at once; each needs one month of raw data in memory, so set N by RAM (`START-HERE.md`, section 2a).
 
+A newer zip that only changes features or models keeps the panel cache already built: `algoe-2-train.bat` skips the cached panel days and rebuilds the features and models.
+
 You want `11 PASS` from the selftest, no `FAIL` from the data check, then the newest `AlgoE_Work\reports\backtest_*\report.html` next to `Raw_Data`.
 
 Before going live:
