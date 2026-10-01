@@ -43,10 +43,12 @@ tar -xf algoe-w10.zip
 cd algoe-w10
 algoe-0-selftest.bat
 algoe-1-check-data.bat
-algoe-2-train.bat --start 2026-07-01 --end 2026-09-15
+algoe-2-train.bat --start 2024-06-01 --end 2026-09-14 --workers 3 --set window.val_start=2025-07-01 --set window.test_start=2026-07-01
 ```
 
 Drag the `Raw_Data` folder onto `algoe-1-check-data.bat` if it is not at `S:\Users\Yeung\20260520 Algo E\Raw_Data`.
+
+Take `--end` from the `window end` line of the data check. `--workers N` builds N months at once; each needs one month of raw data in memory, so set N by RAM (`START-HERE.md`, section 2a).
 
 You want `11 PASS` from the selftest, no `FAIL` from the data check, then the newest `AlgoE_Work\reports\backtest_*\report.html` next to `Raw_Data`.
 
