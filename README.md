@@ -32,3 +32,32 @@ The cache sits next to the parquet root:
 `S:\Users\Yeung\20260520 Algo E\algoe_panel_cache`
 
 If that cache is already there, Open cached does not re-read the raw folders.
+
+## W10 turnover, calibration, optimizer
+
+`algoe-w10.zip` is code only. No parquet, no trained models. Download it on a machine that has GitHub, copy it onto USB, and extract it on the box. The box never clones this repo.
+
+```bat
+cd /d D:\AlgoE
+tar -xf algoe-w10.zip
+cd algoe-w10
+algoe-0-selftest.bat
+algoe-1-check-data.bat
+algoe-2-train.bat --start 2026-07-01 --end 2026-09-15
+```
+
+Drag the `Raw_Data` folder onto `algoe-1-check-data.bat` if it is not at `S:\Users\Yeung\20260520 Algo E\Raw_Data`.
+
+You want `11 PASS` from the selftest, no `FAIL` from the data check, then the newest `AlgoE_Work\reports\backtest_*\report.html` next to `Raw_Data`.
+
+Before going live:
+
+```bat
+algoe-parity.bat --at "2026-09-10 21:30" --at "2026-09-11 00:05"
+algoe-4-live.bat --source replay --at "2026-09-10 20:00" --speed 10
+algoe-4-live.bat
+```
+
+`Identical` from parity means the live engine builds the same inputs the model was trained on. `algoe-4-live.bat` with no arguments reads the SQL feed. Ctrl+C stops it.
+
+Models, reports, and logs are written beside the parquet, under `AlgoE_Work`. Replacing this folder with a newer zip does not delete them.
