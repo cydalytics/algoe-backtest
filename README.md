@@ -50,9 +50,9 @@ Drag the `Raw_Data` folder onto `algoe-1-check-data.bat` if it is not at `S:\Use
 
 Take `--end` from the `window end` line of the data check. `--workers N` builds N months at once; each needs one month of raw data in memory, so set N by RAM (`START-HERE.md`, section 2a).
 
-A newer zip that only changes features or models keeps the panel cache already built: `algoe-2-train.bat` skips the cached panel days and rebuilds the features and models. The 2026-10-06 zip is feature version 8: the same command keeps the panel, rebuilds the features (about 15 hours with `--workers 2`), then trains both models and writes a new backtest.
+A newer zip that only changes features or models keeps the panel cache already built: `algoe-2-train.bat` skips the cached panel days and rebuilds the features and models. The current zip is feature version 9: the same command keeps the panel, rebuilds the features (15+ hours with `--workers 2`), then trains both models (25 turnover pipelines) and writes a new backtest.
 
-Model libraries (`START-HERE.md`, section 0): `lightgbm`, `scikit-learn` and `torch` (CPU) let every pipeline compete; without one, the pipelines it runs are skipped and logged. `python scripts\preflight.py --skip-tick` from `backend` lists what the box has and the wheel tag to download for it.
+Model libraries (`START-HERE.md`, section 0): `lightgbm`, `scikit-learn`, `xgboost`, `catboost` and `torch` (CPU) let every pipeline compete; without one, the pipelines it runs are skipped and logged. `python scripts\preflight.py --skip-tick` from `backend` lists what the box has and the wheel tag to download for it.
 
 To rerun one part of the backtest, for example the optimizer: `algoe-3-backtest.bat --only optimizer` (any of `turnover,groups,trueprob,gm,replication,optimizer`).
 
