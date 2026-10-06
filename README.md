@@ -59,7 +59,16 @@ cd /d D:\AlgoE\offline-wheels-cp311
 install-offline-wheels.bat
 ```
 
-It rejoins the wheels, checks every SHA256, and installs lightgbm, xgboost, catboost and the CPU build of torch without using the network. `cuda False` is the correct result. scikit-learn is already on the box; its wheel is in the zips only as a fallback.
+It rejoins the wheels, checks every SHA256, and installs lightgbm, xgboost, catboost and the CPU build of torch without using the network. It then copies the Visual C++ DLLs from `vc_runtime` into `torch\lib`. Torch's `shm.dll` loads `torch_cpu.dll`, which needs `vcruntime140_threads.dll` and `msvcp140_atomic_wait.dll`. Anaconda's older runtime does not include those, and Windows reports that as "the specified module could not be found" on `shm.dll`. `cuda False` is the correct result only after `import torch` prints a version. scikit-learn is already on the box; its wheel is in the zips only as a fallback.
+
+If lightgbm, xgboost and catboost are already installed and only torch fails to import, do not reinstall the wheels. Copy this folder again so it contains `vc_runtime` and `fix-torch-runtime.bat`, then in the same conda env:
+
+```bat
+cd /d D:\AlgoE\offline-wheels-cp311
+fix-torch-runtime.bat
+```
+
+If that copy is denied, run `vc_redist.x64.exe` in this folder as administrator, open a new prompt, and run `fix-torch-runtime.bat` again.
 
 To rerun one part of the backtest, for example the optimizer: `algoe-3-backtest.bat --only optimizer` (any of `turnover,groups,trueprob,gm,replication,optimizer`).
 
