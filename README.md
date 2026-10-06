@@ -52,7 +52,14 @@ Take `--end` from the `window end` line of the data check. `--workers N` builds 
 
 A newer zip that only changes features or models keeps the panel cache already built: `algoe-2-train.bat` skips the cached panel days and rebuilds the features and models. The current zip is feature version 9: the same command keeps the panel, rebuilds the features (15+ hours with `--workers 2`), then trains both models (25 turnover pipelines) and writes a new backtest.
 
-Model libraries (`START-HERE.md`, section 0): `lightgbm`, `scikit-learn`, `xgboost`, `catboost` and `torch` (CPU) let every pipeline compete; without one, the pipelines it runs are skipped and logged. `python scripts\preflight.py --skip-tick` from `backend` lists what the box has and the wheel tag to download for it.
+Model libraries for Python 3.11, 64-bit Windows are in `offline-wheels-cp311`. GitHub rejects a file over 100 MB, so torch, xgboost and catboost are split and the rest are in two zips. On the offline box, in the conda env that already imports sklearn:
+
+```bat
+cd /d D:\AlgoE\offline-wheels-cp311
+install-offline-wheels.bat
+```
+
+It rejoins the wheels, checks every SHA256, and installs lightgbm, xgboost, catboost and the CPU build of torch without using the network. `cuda False` is the correct result. scikit-learn is already on the box; its wheel is in the zips only as a fallback.
 
 To rerun one part of the backtest, for example the optimizer: `algoe-3-backtest.bat --only optimizer` (any of `turnover,groups,trueprob,gm,replication,optimizer`).
 
