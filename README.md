@@ -50,7 +50,9 @@ Drag the `Raw_Data` folder onto `algoe-1-check-data.bat` if it is not at `S:\Use
 
 Take `--end` from the `window end` line of the data check. `--workers N` builds N months at once; each needs one month of raw data in memory, so set N by RAM (`START-HERE.md`, section 2a).
 
-A newer zip that only changes features or models keeps the panel cache already built: `algoe-2-train.bat` skips the cached panel days and rebuilds the features and models.
+A newer zip that only changes features or models keeps the panel cache already built: `algoe-2-train.bat` skips the cached panel days and rebuilds the features and models. A zip that changes only the models (the 2026-10-06 one: feature version still 7) keeps the features too: the same command skips both, then retrains turnover and probability and writes a new backtest.
+
+To rerun one part of the backtest, for example the optimizer: `algoe-3-backtest.bat --only optimizer` (any of `turnover,groups,trueprob,gm,replication,optimizer`).
 
 You want `11 PASS` from the selftest, no `FAIL` from the data check, then the newest `AlgoE_Work\reports\backtest_*\report.html` next to `Raw_Data`.
 
