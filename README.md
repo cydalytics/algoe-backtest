@@ -59,7 +59,7 @@ cd /d D:\AlgoE\offline-wheels-cp311
 install-offline-wheels.bat
 ```
 
-It rejoins the wheels, checks every SHA256, and installs lightgbm, xgboost, catboost and the CPU build of torch without using the network. It then copies the Visual C++ DLLs from `vc_runtime` into `torch\lib`. Torch's `shm.dll` loads `torch_cpu.dll`, which needs `vcruntime140_threads.dll` and `msvcp140_atomic_wait.dll`. Anaconda's older runtime does not include those, and Windows reports that as "the specified module could not be found" on `shm.dll`. `cuda False` is the correct result only after `import torch` prints a version. scikit-learn is already on the box; its wheel is in the zips only as a fallback.
+It rejoins the wheels, checks every SHA256, and installs lightgbm, xgboost, catboost and the CPU build of torch without using the network. It then copies the Visual C++ DLLs from `vc_runtime` into `torch\lib` and over the older copies in the Anaconda prefix. Torch 2.14's `c10.dll` aborts with WinError 1114 when Python has already loaded Anaconda's older runtime, or Anaconda's `dbghelp.dll`. The old Anaconda files are kept in `vc-runtime-backup`. `cuda False` is the correct result only after `import torch` prints a version. scikit-learn is already on the box; its wheel is in the zips only as a fallback.
 
 If lightgbm, xgboost and catboost are already installed and torch still fails at `torch\__init__.py` line 148, the box is still importing the old torch. Copy the updated `install-offline-wheels.ps1`, `fix-torch-runtime.bat` and `diagnose-torch-dlls.py` into the same folder. `fix-torch-runtime.bat` moves that old torch aside and installs `torch 2.14.1+cpu` from the wheel already extracted there. In the same conda env:
 

@@ -106,6 +106,12 @@ def main() -> int:
         return 1
     prefix = pathlib.Path(sys.prefix)
     windir = pathlib.Path(os.environ.get("SystemRoot", r"C:\Windows"))
+    print("runtime copies:")
+    for name in ("vcruntime140.dll", "vcruntime140_threads.dll", "dbghelp.dll", "libiomp5md.dll"):
+        for folder in (lib, prefix, prefix / "Library" / "bin", windir / "System32"):
+            candidate = folder / name
+            if candidate.exists():
+                print(f"  {candidate} {candidate.stat().st_size}")
     extra = [
         windir / "System32",
         prefix,

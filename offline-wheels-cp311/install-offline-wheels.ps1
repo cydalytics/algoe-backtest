@@ -101,6 +101,58 @@ function Copy-VcRuntimeIntoTorch {
     Write-Host "copied $n VC runtime DLLs into $lib"
 }
 
+function Install-VcRuntimeOverAnaconda {
+    # Python loads vcruntime140.dll from the Anaconda prefix before torch starts.
+    # A newer c10.dll then aborts with WinError 1114 because that already-loaded
+    # runtime is older than the one torch 2.14 was built with. System32 can be
+    # current and torch\lib can contain the new files; the prefix copy still wins.
+    $src = Join-Path $PSScriptRoot "vc_runtime"
+    $prefix = (python -c "import sys; print(sys.prefix)").Trim()
+    $exeDir = (python -c "import pathlib, sys; print(pathlib.Path(sys.executable).parent)").Trim()
+    $dirs = @($prefix, $exeDir, (Join-Path $prefix "Library\bin"), (Join-Path $prefix "DLLs")) |
+        Where-Object { $_ -and (Test-Path $_) } |
+        Select-Object -Unique
+    $backupRoot = Join-Path $PSScriptRoot "vc-runtime-backup"
+    $core = @(
+        "vcruntime140.dll", "vcruntime140_1.dll", "vcruntime140_threads.dll",
+        "msvcp140.dll", "msvcp140_1.dll", "msvcp140_2.dll",
+        "msvcp140_atomic_wait.dll", "msvcp140_codecvt_ids.dll"
+    )
+    foreach ($dir in $dirs) {
+        Get-ChildItem $src -Filter *.dll | ForEach-Object {
+            $dest = Join-Path $dir $_.Name
+            $exists = Test-Path $dest
+            if (-not $exists -and $core -notcontains $_.Name) { return }
+            if (-not $exists -and $dir -like "*\DLLs") { return }
+            if ($exists) {
+                $same = (Get-FileHash $dest -Algorithm SHA256).Hash -eq (Get-FileHash $_.FullName -Algorithm SHA256).Hash
+                if ($same) { return }
+                $leaf = Split-Path $dir -Leaf
+                if ($dir -eq $prefix -or $dir -eq $exeDir) { $leaf = "prefix" }
+                $bak = Join-Path $backupRoot $leaf
+                New-Item -ItemType Directory -Force -Path $bak | Out-Null
+                $bakFile = Join-Path $bak $_.Name
+                if (-not (Test-Path $bakFile)) { Copy-Item $dest $bakFile }
+            }
+            try {
+                Copy-Item $_.FullName $dest -Force
+            } catch {
+                throw "Could not update $dest. Close every Python and Jupyter window, then run fix-torch-runtime.bat again. $($_.Exception.Message)"
+            }
+            Write-Host "updated $dest"
+        }
+    }
+    $dbg = Join-Path $prefix "Library\bin\dbghelp.dll"
+    if (Test-Path $dbg) {
+        $bak = Join-Path $backupRoot "Library-bin"
+        New-Item -ItemType Directory -Force -Path $bak | Out-Null
+        $bakFile = Join-Path $bak "dbghelp.dll"
+        if (-not (Test-Path $bakFile)) { Copy-Item $dbg $bakFile }
+        Move-Item $dbg (Join-Path $prefix "Library\bin\dbghelp.dll.off") -Force
+        Write-Host "moved Anaconda dbghelp.dll aside; torch will use the Windows copy"
+    }
+}
+
 $wheels = Ensure-Wheels
 if (-not $RuntimeOnly) {
     python -m pip install --no-index --find-links $wheels lightgbm xgboost catboost
@@ -109,10 +161,15 @@ if (-not $RuntimeOnly) {
 
 Install-CpuTorch $wheels
 Copy-VcRuntimeIntoTorch
+Install-VcRuntimeOverAnaconda
 
-python -c "import lightgbm,xgboost,catboost,torch; print('lightgbm', lightgbm.__version__); print('xgboost', xgboost.__version__); print('catboost', catboost.__version__); print('torch', torch.__version__, 'cuda', torch.cuda.is_available())"
+python -c "import torch; print('torch', torch.__version__, 'cuda', torch.cuda.is_available())"
 if ($LASTEXITCODE -ne 0) {
     python (Join-Path $PSScriptRoot "diagnose-torch-dlls.py")
     throw "torch 2.14.1 CPU still failed to import. Send the 'missing imports' and 'load test' lines above."
+}
+python -c "import lightgbm,xgboost,catboost,torch; print('lightgbm', lightgbm.__version__); print('xgboost', xgboost.__version__); print('catboost', catboost.__version__); print('torch', torch.__version__, 'cuda', torch.cuda.is_available())"
+if ($LASTEXITCODE -ne 0) {
+    throw "torch imports on its own. Importing it together with lightgbm, xgboost and catboost failed. Send that traceback."
 }
 Write-Host "cuda False is correct: this is the CPU build."
