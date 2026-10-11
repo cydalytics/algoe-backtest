@@ -50,7 +50,16 @@ Drag the `Raw_Data` folder onto `algoe-1-check-data.bat` if it is not at `S:\Use
 
 Take `--end` from the `window end` line of the data check. `--workers N` builds N months at once; each needs one month of raw data in memory, so set N by RAM (`START-HERE.md`, section 2a).
 
-A newer zip that only changes features or models keeps the panel cache already built: `algoe-2-train.bat` skips the cached panel days and rebuilds the features and models. The current zip is feature version 9: the same command keeps the panel, rebuilds the features (15+ hours with `--workers 2`), then trains both models (25 turnover pipelines) and writes a new backtest.
+A newer zip that only changes features or models keeps the panel cache already built: `algoe-2-train.bat` skips the cached panel days and rebuilds the features and models. Feature version 9 is still current: the same command keeps the panel, rebuilds the features (15+ hours with `--workers 2`), then trains both models (25 turnover pipelines) and writes a new backtest.
+
+The 2026-10-11 zip changes neither the features nor the models, so nothing is rebuilt or retrained. It adds the proportion and event study to the backtest (sections 7, 9, 10 and 11: how well the split across bet types, pools, selections and sides is forecast; the WAPE split into rows with and without money; goals, red cards and corners before and after, by favourite, whose event, clock and score; buckets with an event inside them, with the forecast re-tuned at the event's minute; the fitted event shift). The live engine now keeps a match on 15-second refreshes after a goal, red card or corner, and re-tunes the rest of the bucket with the fitted shift. Unzip it over the old folder, then:
+
+```bat
+algoe-0-selftest.bat
+algoe-3-backtest.bat --only events
+```
+
+The selftest should end `12 PASS`. The backtest reads 45 validation days and the 87 test days, writes a new `AlgoE_Work\reports\backtest_*\report.html` with sections 7, 9, 10 and 11, and saves `AlgoE_Work\models\turnover\EVENT_SHIFT.json` for the live engine. The earlier report keeps sections 1 to 8.
 
 Model libraries for Python 3.11, 64-bit Windows are in `offline-wheels-cp311`. GitHub rejects a file over 100 MB, so torch, xgboost and catboost are split and the rest are in two zips. On the offline box, in the conda env that already imports sklearn:
 
@@ -70,9 +79,9 @@ fix-torch-runtime.bat
 
 If that copy is denied, run `vc_redist.x64.exe` in this folder as administrator, open a new prompt, and run `fix-torch-runtime.bat` again.
 
-To rerun one part of the backtest, for example the optimizer: `algoe-3-backtest.bat --only optimizer` (any of `turnover,groups,trueprob,gm,replication,optimizer`).
+To rerun one part of the backtest, for example the optimizer: `algoe-3-backtest.bat --only optimizer` (any of `turnover,groups,trueprob,gm,replication,optimizer,drift,events,mix,elasticity`; `events` and `mix` run the same pass).
 
-You want `11 PASS` from the selftest, no `FAIL` from the data check, then the newest `AlgoE_Work\reports\backtest_*\report.html` next to `Raw_Data`.
+You want `12 PASS` from the selftest, no `FAIL` from the data check, then the newest `AlgoE_Work\reports\backtest_*\report.html` next to `Raw_Data`.
 
 Before going live:
 
