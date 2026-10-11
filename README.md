@@ -15,9 +15,20 @@ cd algoe-mvp
 start.bat -Source sql
 ```
 
-`-Source sql` is the live board: the home page reads HKJC SQL Server. The backtest page does not. It reads the parquet folder you type.
+`-Source sql` is the live board: the home page reads HKJC SQL Server. The backtest page does not.
 
-Open http://localhost:3000/backtest. The page says **No backtest yet**. Click **Run**.
+Open http://localhost:3000/backtest. The bar at the top switches between two sources.
+
+**Algo E model (W10)**, the default, reads the reports `algoe-3-backtest.bat` writes under `AlgoE_Work\reports` (beside `Raw_Data`). It uses the newest copy of every section, so the full run and a later `algoe-3-backtest.bat --only events` run show as one report. Views:
+
+- **Overview**: the champion against last 5 minutes, and what the run says, line by line.
+- **Baseline vs model**: last 5 min (A), the champion (B) and the champion re-tuned at the event (C) on the same rows. It shows headline deltas, every test day, every slice (phase, clock, after an event, an event inside the 5 minutes, bet type, league), the split, the rows that took no money, a match replay with goals / red cards / corners marked, and how far off each match-bucket was.
+- **Leaderboard**: every pipeline, any two against each other, and the feature groups.
+- **Proportions**, **Events**, and **Drift, belief, margin**.
+
+The folder follows `ALGOE_DATA_DIR` / `ALGOE_WORK_DIR`. If `Raw_Data` is not at `S:\Users\Yeung\20260520 Algo E\Raw_Data`, set `ALGOE_DATA_DIR` before `start.bat`, or type the `AlgoE_Work` folder under **Reports** on the page.
+
+**Workbench (W06 parquet)** is the parquet bench as before. It reads the parquet folder you type. The page says **No backtest yet**. Click **Run**.
 
 In the drawer, **Real data** is already selected. Set **Data folder** to the parquet on this machine (default `S:\Users\Yeung\20260520 Algo E\Raw_Data`). Set **From** / **To**. Click **Check data**, then **Build**.
 
@@ -52,7 +63,9 @@ Take `--end` from the `window end` line of the data check. `--workers N` builds 
 
 A newer zip that only changes features or models keeps the panel cache already built: `algoe-2-train.bat` skips the cached panel days and rebuilds the features and models. Feature version 9 is still current: the same command keeps the panel, rebuilds the features (15+ hours with `--workers 2`), then trains both models (25 turnover pipelines) and writes a new backtest.
 
-The 2026-10-11 zip changes neither the features nor the models, so nothing is rebuilt or retrained. It adds the proportion and event study to the backtest (sections 7, 9, 10 and 11: how well the split across bet types, pools, selections and sides is forecast; the WAPE split into rows with and without money; goals, red cards and corners before and after, by favourite, whose event, clock and score; buckets with an event inside them, with the forecast re-tuned at the event's minute; the fitted event shift). The live engine now keeps a match on 15-second refreshes after a goal, red card or corner, and re-tunes the rest of the bucket with the fitted shift. Unzip it over the old folder, then:
+The 2026-10-12 zips (`algoe-w10.zip` and `algoe-mvp.zip`) supersede the 2026-10-11 one. The events pass now also writes the baseline-vs-model data the desk's Backtest tab draws, and scores accuracy on every row as the leaderboard does, so its totals equal the leaderboard's. If you ran `--only events` with the 2026-10-11 zip, run it again with this one.
+
+These zips change neither the features nor the models, so nothing is rebuilt or retrained. It adds the proportion and event study to the backtest (sections 7, 9, 10 and 11: how well the split across bet types, pools, selections and sides is forecast; the WAPE split into rows with and without money; goals, red cards and corners before and after, by favourite, whose event, clock and score; buckets with an event inside them, with the forecast re-tuned at the event's minute; the fitted event shift). The live engine now keeps a match on 15-second refreshes after a goal, red card or corner, and re-tunes the rest of the bucket with the fitted shift. Unzip it over the old folder, then:
 
 ```bat
 algoe-0-selftest.bat
