@@ -1,0 +1,6 @@
+# The package scripts assemble these folders before zipping them; only the zips are published.
+/algoe-mvp/
+/algoe-w10/
+/algoe-backtest/
+/algoe-turnover/
+/algoe-turnover.zip

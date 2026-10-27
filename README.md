@@ -6,6 +6,32 @@ Download on a machine that has GitHub. Copy `algoe-mvp.zip` onto USB (or a share
 
 `algoe-backtest.zip` is a separate script that writes a static file, `out\report.html`. You do not need it. The page you open in the browser is the web app in `algoe-mvp.zip`.
 
+## 2026-10-27 zips (W12)
+
+`algoe-mvp.zip` and `algoe-w10.zip` of 2026-10-27 supersede the 2026-10-12 ones. They change neither the features nor the models, so nothing is retrained. Unzip each over its old folder.
+
+- The board and the cockpit read the W10 live engine. Opening a match re-reads it from SQL and solves it again on the board of that moment (newest TG / SUP, prices, score), then every 15 s while it is open. The book names the sides Home / Away. The old "next 5 minutes = last 5 minutes" is only the `Last 5m` column.
+- `algoe-update-data.bat` keeps `Raw_Data` current with the queries of `1 Data Extraction.ipynb`. It starts from the day before the newest day on disk: monthly files are extracted whole again, Match_Investments day by day. A file replaces the old one only when it is complete, and the cached days it read again are rebuilt.
+- `start.bat` starts that update in its own window when the data is older than yesterday. `algoe-schedule-update.bat` registers it every morning at 06:00 (no admin rights).
+- `algoe-6-probe-live.bat --match <id>` checks the live money feed on a match in play. `algoe-3-backtest.bat --only replication --days FROM:TO` checks the first-half split, with no model.
+- `algoe-models.html` explains the turnover and true-probability models. Open it in a browser; it needs no network.
+
+First run on the office box:
+
+```bat
+cd /d D:\AlgoE
+tar -xf algoe-mvp.zip
+tar -xf algoe-w10.zip
+cd algoe-w10
+algoe-update-data.bat --dry-run
+algoe-update-data.bat
+algoe-schedule-update.bat
+cd ..\algoe-mvp
+start.bat -Source sql
+```
+
+`--dry-run` prints what it would extract and changes nothing. With the newest parquet on 1 October, the first run extracts September and October again and the investment days from 30 September, then rebuilds those days' panel and features. Its timings are in `Raw_Data\_algoe_update.json` and the window.
+
 ## Office box
 
 ```bat
