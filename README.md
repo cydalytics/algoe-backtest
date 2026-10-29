@@ -6,6 +6,15 @@ Download on a machine that has GitHub. Copy `algoe-mvp.zip` onto USB (or a share
 
 `algoe-backtest.zip` is a separate script that writes a static file, `out\report.html`. You do not need it. The page you open in the browser is the web app in `algoe-mvp.zip`.
 
+## 2026-10-29 zips (W14)
+
+`algoe-mvp.zip` and `algoe-w10.zip` of 2026-10-29 supersede the 2026-10-27 ones. They change neither the features nor the models, so nothing is retrained. Unzip each over its old folder.
+
+- Publishing to HKJC's pricing engine over Kafka: theta* and the weightings out, the engine's prices back beside ours on the desk. **Off** unless the box is set up for it; with nothing set the desk is the W12 desk. The procedure is RUNBOOK section 9 (and START-HERE): a dry run on the box first, then `algoe-7-kafka-check.bat` on the test topics, then the test mode. The modes that write to production need a confirmation file as well as the setting, and the board's `Stop publishing` stops it across restarts.
+- The Kafka settings (brokers, topics, login) go in `%USERPROFILE%\algoe-kafka.cmd`, copied from `kafka.example.cmd` - never in a folder that is zipped or uploaded.
+- The Kafka library is `offline-wheels-cp311\wheels-3.zip` (confluent-kafka 2.16.1, cp311). After `install-offline-wheels.bat` has unpacked the wheels, only for the test and production modes: `python -m pip install --no-index --find-links <offline-wheels-cp311>\wheels -r backend\requirements-kafka.txt`.
+- The selftest has 13 checks (S13 runs publishing against a mock engine on the box).
+
 ## 2026-10-27 zips (W12)
 
 `algoe-mvp.zip` and `algoe-w10.zip` of 2026-10-27 supersede the 2026-10-12 ones. They change neither the features nor the models, so nothing is retrained. Unzip each over its old folder.
