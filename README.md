@@ -6,6 +6,20 @@ Download on a machine that has GitHub. Copy `algoe-mvp.zip` onto USB (or a share
 
 `algoe-backtest.zip` is a separate script that writes a static file, `out\report.html`. You do not need it. The page you open in the browser is the web app in `algoe-mvp.zip`.
 
+## 2026-11-09 zips (W14)
+
+Download `algoe-mvp.zip` and `algoe-w14.zip`. Leave `algoe-w10.zip` where it is: that name is the previous package. Unzip the two new files over `D:\AlgoE`. The library folder is now `algoe-w14`. Nothing is retrained.
+
+Kafka now sends one snapshot per match (`schema` `algoe.snapshot`): parameters, every selection's weight, the 5-minute turnover and the calibrated probability. `msg_id` is a number, the Hong Kong date plus a six-digit sequence. SQL connections ask for a read-only replica in code. The procedure is still RUNBOOK section 9: dry run first, then `algoe-7-kafka-check.bat`, then test. Production modes still need `AlgoE_Work\publish\CONFIRM-PRODUCTION.txt`.
+
+```bat
+cd /d D:\AlgoE
+tar -xf algoe-mvp.zip
+tar -xf algoe-w14.zip
+cd algoe-mvp
+start.bat -Source sql
+```
+
 ## 2026-10-29 zips (W14)
 
 `algoe-mvp.zip` and `algoe-w10.zip` of 2026-10-29 supersede the 2026-10-27 ones. They change neither the features nor the models, so nothing is retrained. Unzip each over its old folder.
