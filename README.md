@@ -6,6 +6,20 @@ Download on a machine that has GitHub. Copy `algoe-mvp.zip` onto USB (or a share
 
 `algoe-backtest.zip` is a separate script that writes a static file, `out\report.html`. You do not need it. The page you open in the browser is the web app in `algoe-mvp.zip`.
 
+## 2026-11-19 zips (W14)
+
+Download `algoe-mvp.zip` and `algoe-w14.zip` again. They replace the 2026-11-09 pair. Unzip both over `D:\AlgoE`. Nothing is retrained.
+
+The board lists a match from the moment its pools are selling, not only in the last 6 hours before kick-off. The model still scores and publishes only inside those 6 hours. Kafka is still one `algoe.snapshot` per match. SQL connections still ask for a read-only replica in code.
+
+```bat
+cd /d D:\AlgoE
+tar -xf algoe-mvp.zip
+tar -xf algoe-w14.zip
+cd algoe-mvp
+start.bat -Source sql
+```
+
 ## 2026-11-09 zips (W14)
 
 Download `algoe-mvp.zip` and `algoe-w14.zip`. Leave `algoe-w10.zip` where it is: that name is the previous package. Unzip the two new files over `D:\AlgoE`. The library folder is now `algoe-w14`. Nothing is retrained.
