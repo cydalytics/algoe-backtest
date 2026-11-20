@@ -6,6 +6,41 @@ Download on a machine that has GitHub. Copy `algoe-mvp.zip` onto USB (or a share
 
 `algoe-backtest.zip` is a separate script that writes a static file, `out\report.html`. You do not need it. The page you open in the browser is the web app in `algoe-mvp.zip`.
 
+## 2026-11-20 zips (W16, first release)
+
+Download `algoe-mvp.zip` and `algoe-w16.zip`. Leave `algoe-w14.zip` where it is: that is the previous package. Unzip the two new files over `D:\AlgoE`. The library folder is now `algoe-w16`. Nothing is retrained.
+
+- Every match on sale gets a decision. A match more than 6 hours from kick-off (`far`) takes its money from the far pre-match curve. A pre-match line keeps its price whatever its age. A match expecting under HK$500 in the bucket holds the board. A match without an HKJC TG/SUP row is priced at the theta its own odds imply (`implied θ`) and is never published.
+- The fast lane: every match in play or within 90 minutes of kick-off is re-read and re-solved every 15 s, with publishing on or off. When publishing is on, it also sends every 15 s; a pre-match message carries `update: "refresh"`. Other matches move at the 5-minute sweep.
+- The cockpit shows the 5-minute bucket: its clock, the money received against the money expected, the rest, and what the solve priced. Each selection shows `5m exp`, `Rcvd` and `Rest`.
+- Stage 2 is on the desk: the `W` column, and the inspector's `Weights` tab line by line. Each line keeps its overround.
+- The weightings are damped. Each refresh moves at most one or two points, and only half the way. They move only when the move earns 0.5 bp. A big single ticket counts for less, and no price goes past the market.
+- The board says `live money feed empty` when the models expect money and the live money table shows none.
+
+First run on the office box:
+
+```bat
+cd /d D:\AlgoE
+tar -xf algoe-mvp.zip
+tar -xf algoe-w16.zip
+cd algoe-w16
+algoe-0-selftest.bat
+algoe-6-probe-live.bat --match <a match in play> --intent both
+algoe-8-fit-far-prematch.bat
+cd ..\algoe-mvp
+start.bat -Source sql
+```
+
+- The selftest should end `13 PASS`.
+- `--intent both` reads the live money on a ReadOnly and on a ReadWrite connection. It FAILs when ReadOnly reads no rows while ReadWrite reads money: the read-only replica does not carry the in-memory money table.
+  - Send that output to the data engineering team.
+  - Only with their agreement, set `ALGOE_SQL_INTENT_BIS2=readwrite` before `start.bat`.
+- `algoe-8-fit-far-prematch.bat` fits the far curve on `Raw_Data` (the last 42 days, the last 7 held out).
+  - It saves the curve only when it beats last 5 minutes on the held-out days; `--force` saves it anyway.
+  - Until a curve is saved, the Engine row says `far pre-match: default curve`.
+
+The next zip adds the data-quality check (and the re-extract of 2026-09-27/28), the daily scheduled job with walk-forward scores, and faster reads.
+
 ## 2026-11-19 zips (W14)
 
 Download `algoe-mvp.zip` and `algoe-w14.zip` again. They replace the 2026-11-09 pair. Unzip both over `D:\AlgoE`. Nothing is retrained.
