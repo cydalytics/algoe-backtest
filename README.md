@@ -6,6 +6,47 @@ Download on a machine that has GitHub. Copy `algoe-mvp.zip` onto USB (or a share
 
 `algoe-backtest.zip` is a separate script that writes a static file, `out\report.html`. You do not need it. The page you open in the browser is the web app in `algoe-mvp.zip`.
 
+## 2026-11-21 zips (W16, second release)
+
+Download `algoe-mvp.zip` and `algoe-w16.zip` again. They replace the 2026-11-20 pair. Unzip both over `D:\AlgoE`. Nothing is retrained.
+
+- Each Match_Investments day is checked before it is written. The check compares the pools with money against the pools that concluded that day (G2_pool_details), and the money and rows against the usual day of its kind.
+  - A suspect day is left out of panels, fits and scores.
+  - Suspect and provisional days of the last 30 are extracted again on every run.
+  - A new extract never replaces a file with more money, or a file that is not suspect when the new extract is (`--force` replaces it anyway).
+- `start.bat` registers the Windows task `AlgoE daily` (06:00, no admin rights). It runs `algoe-nightly.bat`: new data, panels, features, the day's walk-forward score, monitor, refit.
+- Walk-forward: each new day is scored for the champion that served it, before the refit (`AlgoE_Work\reports\daily`). The Backtest tab's day chart carries on past the report with dashed bars. Days whose money is suspect, or changed after their score, are drawn faint and not counted.
+- The board's data chip shows the newest day of data, the last daily run and the suspect days of the last 30.
+- The fast lane reads only the new odds, market odds and money, counted from SQL's own timestamps. Each sweep checks them against a full read, and the lane reads in full while the two differ. The trigger scan reads only the matches off the fast lane, once a minute. The publishing strip shows the cycle's p95.
+- Two reviewers from other model families went through the optimizer, the live engine, the reads, data quality and walk-forward. What they found, what was fixed and what was kept as designed is in `docs\W16_PIPELINE_AUDIT.md`, section 9.
+
+First run on the office box:
+
+```bat
+cd /d D:\AlgoE
+tar -xf algoe-mvp.zip
+tar -xf algoe-w16.zip
+cd algoe-w16
+algoe-0-selftest.bat
+algoe-1-check-data.bat
+algoe-update-data.bat --days 2026-09-27:2026-09-28
+schtasks /Delete /TN "AlgoE data update" /F
+cd ..\algoe-mvp
+start.bat -Source sql
+```
+
+- The selftest should end `14 PASS` (S14 times the fast lane and checks incremental reads against full reads).
+- `algoe-1-check-data.bat` gives every Match_Investments day on disk a verdict. Expect 2026-09-27 and 2026-09-28 to be suspect. `algoe-update-data.bat --days 2026-09-27:2026-09-28` extracts those two again.
+- `schtasks /Delete` removes the old `AlgoE data update` task, if `algoe-schedule-update.bat` ever registered it: `AlgoE daily` does what it did and more. `ERROR: The system cannot find the file specified.` means it was never there.
+- `start.bat` registers `AlgoE daily` the first time it runs (`-NoSchedule` skips that). Check it with `schtasks /Query /TN "AlgoE daily"`.
+- On a busy evening, time the fast lane on SQL. It exits 2 when p95 is over 15 s:
+
+  ```bat
+  cd /d D:\AlgoE\algoe-w16\backend
+  python -m algoe bench-live --source sql --cycles 20
+  ```
+- If `algoe-8-fit-far-prematch.bat` has not run yet, run it as in the first release.
+
 ## 2026-11-20 zips (W16, first release)
 
 Download `algoe-mvp.zip` and `algoe-w16.zip`. Leave `algoe-w14.zip` where it is: that is the previous package. Unzip the two new files over `D:\AlgoE`. The library folder is now `algoe-w16`. Nothing is retrained.
