@@ -10,6 +10,8 @@ Download on a machine that has GitHub. Copy `algoe-mvp.zip` onto USB (or a share
 
 Download `algoe-mvp.zip` and `algoe-w16.zip` again. They replace the 2026-11-20 pair. Unzip both over `D:\AlgoE`. Nothing is retrained.
 
+These are the evening upload of 21 Nov. With the morning's pair, the selftest failed S14 on the office box (`KeyError: None of [Index([-2, -2, ...` in `incremental.py`): the office's pandas (Anaconda, before 2.2) handles replay's nullable columns differently from the pandas the zips were built and tested on. If you have the morning's pair, download both again and unzip over them.
+
 - Each Match_Investments day is checked before it is written. The check compares the pools with money against the pools that concluded that day (G2_pool_details), and the money and rows against the usual day of its kind.
   - A suspect day is left out of panels, fits and scores.
   - Suspect and provisional days of the last 30 are extracted again on every run.
